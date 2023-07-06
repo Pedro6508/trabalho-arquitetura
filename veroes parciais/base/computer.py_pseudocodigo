@@ -1,0 +1,14 @@
+X <- X + memory[50]
+if X=0 goto 7
+X <- X + memory[100]
+X <- X - memory[130]
+memory[150] = X
+stop
+
+
+
+
+
+
+
+2 50 15 7 2 100 6 130 10 150 255

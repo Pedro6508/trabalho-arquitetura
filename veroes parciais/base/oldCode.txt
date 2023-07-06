@@ -1,0 +1,32 @@
+    # if control_bits == 0b011000: 
+    #     out = a
+    # elif control_bits == 0b010100:
+    #     out = b
+    # elif control_bits == 0b011010:
+    #     out = ~a
+    # elif control_bits == 0b101100:
+    #     out = ~b
+    # elif control_bits == 0b111100:
+    #     out = a + b    
+    # elif control_bits == 0b111101:
+    #     out = a + b + 1
+    # elif control_bits == 0b111001:
+    #     out = a + 1
+    # elif control_bits == 0b110101:
+    #     out = b + 1
+    # elif control_bits == 0b111111:
+    #     out = b - a
+    # elif control_bits == 0b110110:
+    #     out = b - 1
+    # elif control_bits == 0b111011:
+    #     out = -a
+    # elif control_bits == 0b001100:
+    #     out = a & b
+    # elif control_bits == 0b011100:
+    #     out = a | b 
+    # elif control_bits == 0b010000:
+    #     out = 0
+    # elif control_bits == 0b110001:
+    #     out = 1
+    # elif control_bits == 0b110010:
+    #     out = -1 
