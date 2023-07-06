@@ -1,49 +1,66 @@
 from array import array
+from copy import copy
+from firmware import ARCH, int_from_array
 
-ARCH = 32
+ARCH_MASK = (2 ** ARCH) - 1
+
+ARR_CODE = 0b00
+MAR_CODE = 0b01
+MDR_CODE = 0b10
+
+ARR_SIZE = ARCH << 2
+REG_MASK = 0b11
+REG_TYPE = 0b100
+
+ARCH_ARRAY = lambda: array('B', [0]) * ARCH
 
 REGISTERS = {
-    'r0': array('B', [0]) * ARCH,
-    'r1': array('B', [0]) * ARCH,
-    'r2': array('B', [0]) * ARCH,
-    'r3': array('B', [0]) * ARCH
+    'r0': ARCH_ARRAY(),
+    'r1': ARCH_ARRAY(),
+    'r2': ARCH_ARRAY(),
+    'r3': ARCH_ARRAY(),
+
+    'AAR': array('B', [0]) * ARR_SIZE,  # Auxiliary Arithmetic Register
+
+    'MAR': ARCH_ARRAY(),  # Memory Address Register
+    'MDR': ARCH_ARRAY(),  # Memory Data Register
+
+    'MIR': ARCH_ARRAY()  # Memory Instruction Register
 }
 
 
 def write_register(reg_code: [int], data: [int]):
-    global REGISTERS
-    code_num = toNum_aux(reg_code) & 0b11
-    reg_path = "r" + str(code_num)
+    reg_path = demux_register(reg_code)
 
     for i, bit in enumerate(data):
         REGISTERS[reg_path][i] = bit
 
 
-def read_register(reg_code: [int]):
-    global REGISTERS
-    code_num = toNum_aux(reg_code) & 0b11
-    reg_path = "r" + str(code_num)
+def read_register(reg_code: [int]) -> [int]:
+    reg_path = demux_register(reg_code)
 
-    return REGISTERS[reg_path]
+    return copy(REGISTERS[reg_path])  # copy para evitar atribuicao de valor com read
+
 
 # Metodos Auxiliares
 
-def toArr_aux(value: int, word_size=0):
-    global ARCH
-    word_size = word_size & 0b11
-    arr = array('B', [0]) * (ARCH >> word_size)
-
-    binStr = bin(value)[2:]
-    last_bit = min(len(binStr), len(arr)) - 1
-    for i, bit in enumerate(binStr):
-        arr[last_bit - i] = int(bit)
-
-    return arr
+def demux_register(reg_code: [int]) -> [int]:
+    global REGISTERS, REG_TYPE, REG_MASK
 
 
-def toNum_aux(arr: [int]):
-    num = 0
-    for i, _ in enumerate(arr):
-        num += arr[i] * (2 ** i)
+    code_raw = int_from_array(reg_code) & 0b111
+    if code_raw & REG_TYPE == REG_TYPE:
+        # Proposito Geral
+        reg_path = "r" + str(code_raw & REG_MASK)
+    else:
+        # Proposito Especifico
+        if code_raw & REG_MASK == ARR_CODE:
+            reg_path = 'AAR'
+        elif code_raw & REG_MASK == MAR_CODE:
+            reg_path = 'MAR'
+        elif code_raw & REG_MASK == MDR_CODE:
+            reg_path = 'MDR'
+        else:
+            reg_path = '----'
 
-    return num
+    return reg_path

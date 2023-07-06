@@ -103,7 +103,7 @@ def encode_instruction(inst, ops):
    
 # firmware[17:255] -> free 
 def make_add_firmware(inst, ops):
-   ALU = 00111100 # H + Reg
+   ALU = 0b111100 # H + Reg
    h = 0
    b = 0
 

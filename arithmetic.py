@@ -1,37 +1,83 @@
 from array import array
+
+import firmware
 import registers as reg
+
+get_ZERO = lambda size: array('B', [0]) * size   # Zero não é registrador
+
+get_ARR = lambda: reg.read_register(
+            firmware.array_from_int(reg.ARR_CODE)
+)
+
+set_ARR = lambda DATA: reg.write_register(
+    firmware.array_from_int(reg.ARR_CODE),
+    DATA
+)
+
+clean_ARR = lambda: set_ARR(
+    get_ZERO(reg.ARR_SIZE)
+)
+
+def mult_32_bits(reg_code_x: [int], reg_code_y: [int]):
+    global get_ARR, get_ZERO, clean_ARR
+    reg_x = reg.read_register(reg_code_x)
+    reg_y = reg.read_register(reg_code_y)
+
+    ARR = get_ARR()
+
+    return 0
+
 
 
 def full_adder_32bits(reg_code_x: [int], reg_code_y: [int]):
     reg_x = reg.read_register(reg_code_x)
     reg_y = reg.read_register(reg_code_y)
 
-    carry = 0
-    result = array('B', [0]) * reg.ARCH
+    carry = get_ZERO(firmware.ARCH + 1)
+    result = get_ZERO(firmware.ARCH)
 
-    for i in range(0, reg.ARCH):
+    for i in range(0, firmware.ARCH):
         res = full_adder_1bit_aux(
             a=reg_x[i],
             b=reg_y[i],
-            c_in=carry
+            c_in=carry[i]
         )
 
-        carry = res['c_out']
         result[i] = res['s']
+        carry[i+1] = res['c_out']
+
+    last_carry_bit = carry[len(carry)-1]
 
     return {
         "result": result,
-        "carry": carry
+        "carry": last_carry_bit
     }
 
 
+# Metodos Auxiliares
+
+
+def mask_aux(mod_mask: int, size=None):
+    global get_ZERO
+    if size is None:
+        size = firmware.ARCH
+
+    mask = get_ZERO(size)
+
+    for i in range(0, size):
+        if i & mod_mask == 0:
+            mask[i] = 1
+
+    return mask
+
+
 def shift_aux(arr: [int], shift_size: int, shift_num: int):
-    shift_size = shift_size & 0b11
-    shift_num = shift_num & 0b11
+    shift_size00 = shift_size & 0b11
+    shift_num00 = shift_num & 0b11
 
-    total_shift = shift_size*shift_num
+    total_shift = shift_size00*shift_num00
 
-    for i,bit in enumerate(arr):
+    for i, bit in enumerate(arr):
         shifted_i = i + total_shift
         if shifted_i < len(arr):
             arr[shifted_i] = bit
@@ -40,8 +86,6 @@ def shift_aux(arr: [int], shift_size: int, shift_num: int):
 
     return arr
 
-
-# Metodos Auxiliares
 
 
 def mult_2bits_aux(a: int, b: int):
@@ -71,15 +115,17 @@ def mult_2bits_aux(a: int, b: int):
     p10 = sum_1['s']
     p11 = sum_0['c']
 
-    result = {}
+    result = (p11 << 3) + (p10 << 2) + (p01 << 1) + p00
+
+    return result
 
 
 def half_adder_aux(a: int, b: int):
-    a = a & 0b1
-    b = b & 0b1
+    a0 = a & 0b1
+    b0 = b & 0b1
 
-    s = a ^ b
-    c = a & b
+    s = a0 ^ b0
+    c = a0 & b0
 
     return {
         's': s,
@@ -88,18 +134,18 @@ def half_adder_aux(a: int, b: int):
 
 
 def full_adder_1bit_aux(a: int, b: int, c_in):
-    a = a & 0b1
-    b = b & 0b1
-    c_in = c_in & 0b1
+    a0 = a & 0b1
+    b0 = b & 0b1
+    c_in0 = c_in & 0b1
 
     half_a_1 = half_adder_aux(
-        a=a,
-        b=b
+        a=a0,
+        b=b0
     )
 
     half_a_2 = half_adder_aux(
         a=half_a_1['s'],
-        b=c_in
+        b=c_in0
     )
 
     s = half_a_2['s']
