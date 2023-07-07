@@ -1,7 +1,5 @@
-import memory
-from array import array
 import random
-import numpy as np
+from array import array
 
 firmware = array('L', [0]) * 512
 

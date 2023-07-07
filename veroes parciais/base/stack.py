@@ -1,7 +1,4 @@
-import memory
 from array import array
-import random
-import numpy as np
 
 stack = []
 Arch  = 6 # 64

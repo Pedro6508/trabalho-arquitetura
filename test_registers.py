@@ -1,9 +1,9 @@
-import unittest
 import random as r
+import unittest
 
+import arithmetic as arith
 import firmware
 import registers as reg
-import arithmetic as arith
 
 
 def rand_bin(size: int, log_compensation=True) -> int:

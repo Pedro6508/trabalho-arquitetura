@@ -1,8 +1,9 @@
-import ufc2x as cpu
 import sys
-import memory as mem
-import clock as clk 
+
+import clock as clk
 import disk
+import memory as mem
+import ufc2x as cpu
 
 disk.read(str(sys.argv[1]))
 

@@ -1,5 +1,6 @@
-import memory
 from array import array
+
+import memory
 
 firmware = array('L', [0]) * 512
 

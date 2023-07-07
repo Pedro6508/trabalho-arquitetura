@@ -12,6 +12,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="firmware.*" />
+          <option value="super.*" />
         </list>
       </option>
     </inspection_tool>

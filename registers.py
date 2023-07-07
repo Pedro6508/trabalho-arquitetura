@@ -1,5 +1,6 @@
 from array import array
 from copy import copy
+
 from firmware import ARCH, int_from_array
 
 ARCH_MASK = (2 ** ARCH) - 1
@@ -29,15 +30,21 @@ REGISTERS = {
 }
 
 
-def write_register(reg_code: [int], data: [int]):
-    reg_path = demux_register(reg_code)
+def write_register(reg_code: [int], data: [int], path=None):
+    if path is None:
+        reg_path = demux_register(reg_code)
+    else:
+        reg_path = path
 
     for i, bit in enumerate(data):
         REGISTERS[reg_path][i] = bit
 
 
-def read_register(reg_code: [int]) -> [int]:
-    reg_path = demux_register(reg_code)
+def read_register(reg_code: [int], path=None) -> [int]:
+    if path is None:
+        reg_path = demux_register(reg_code)
+    else:
+        reg_path = path
 
     return copy(REGISTERS[reg_path])  # copy para evitar atribuicao de valor com read
 
